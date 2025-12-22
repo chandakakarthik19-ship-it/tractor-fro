@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | Tractor Tracker</title>
+
+  <style>
+    :root{
+      --primary:#2563eb;
+      --bg:#f3f4f6;
+      --card:#ffffff;
+      --border:#e5e7eb;
+      --text:#1f2937;
+      --muted:#6b7280;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      font-family:"Segoe UI", Tahoma, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .container{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .card{
+      width:100%;
+      max-width:420px;
+      background:var(--card);
+      padding:35px;
+      border-radius:16px;
+      box-shadow:0 15px 30px rgba(0,0,0,0.08);
+    }
+
+    h1{
+      text-align:center;
+      color:var(--primary);
+      margin-bottom:5px;
+    }
+
+    p.subtitle{
+      text-align:center;
+      color:var(--muted);
+      margin-bottom:25px;
+      font-size:14px;
+    }
+
+    label{
+      display:block;
+      margin-top:14px;
+      font-weight:600;
+      font-size:14px;
+    }
+
+    input{
+      width:100%;
+      padding:10px 12px;
+      margin-top:6px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      font-size:14px;
+    }
+
+    input:focus{
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 0 2px rgba(37,99,235,0.15);
+    }
+
+    button{
+      width:100%;
+      margin-top:22px;
+      padding:12px;
+      background:var(--primary);
+      color:white;
+      border:none;
+      border-radius:10px;
+      font-size:15px;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    button:hover{
+      opacity:0.9;
+    }
+
+    .links{
+      text-align:center;
+      margin-top:18px;
+      font-size:14px;
+    }
+
+    .links a{
+      color:var(--primary);
+      text-decoration:none;
+      font-weight:600;
+    }
+
+    .links a:hover{
+      text-decoration:underline;
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="card">
+    <h1>Admin Login</h1>
+    <p class="subtitle">Tractor Tracker Management</p>
+
+    <label for="adminUser">Username</label>
+    <input
+      id="adminUser"
+      type="text"
+      placeholder="Enter admin username"
+      aria-label="Admin Username"
+      title="Admin Username"
+    >
+
+    <label for="adminPass">Password</label>
+    <input
+      id="adminPass"
+      type="password"
+      placeholder="Enter admin password"
+      aria-label="Admin Password"
+      title="Admin Password"
+    >
+
+    <button id="adminLogin">Login</button>
+
+    <div class="links">
+      <a href="index.html">⬅ Back to Home</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = "https://tractor-back-1l40.onrender.com";
+
+document.getElementById('adminLogin').addEventListener('click', async () => {
+  const username = document.getElementById('adminUser').value.trim();
+  const password = document.getElementById('adminPass').value;
+
+  if(!username || !password){
+    alert('Please enter username and password');
+    return;
+  }
+
+  const res = await fetch(API + '/auth/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  });
+
+  const data = await res.json();
+
+  if (data.token) {
+    localStorage.setItem('adminToken', data.token);
+    window.location.href = 'admin.html';
+  } else {
+    alert(data.error || 'Login failed');
+  }
+});
+</script>
+
+</body>
+</html>
