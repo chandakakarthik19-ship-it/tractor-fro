@@ -214,34 +214,41 @@
 const API = "https://tractor-back-1l40.onrender.com";
 
 async function load(){
-  const id = localStorage.getItem('farmerId');
-  if(!id) return location.href='farmer-login.html';
+  const token = localStorage.getItem('token');
+  const name = localStorage.getItem('name');
 
-  /* FARMER INFO */
-  const res = await fetch(API + '/farmer/' + id);
-  const f = await res.json();
+  if(!token){
+    location.href = 'farmer-login.html';
+    return;
+  }
 
+  /* FARMER INFO (from localStorage) */
   document.getElementById('info').innerHTML = `
     <div>
-      <strong>${f.name}</strong><br>
-      <span>Phone: ${f.phone}</span>
+      <strong>${name}</strong><br>
+      <span>Role: Farmer</span>
     </div>
     <div class="actions">
-      <a href="${API}/farmer/${id}/history/pdf">Download PDF</a>
       <a class="logout" href="index.html" onclick="localStorage.clear()">Logout</a>
     </div>
   `;
 
-  /* WORK HISTORY */
-  const hr = await fetch(API + '/farmer/' + id + '/history');
-  const works = await hr.json();
+  /* WORK HISTORY (CORRECT API) */
+  const res = await fetch(API + '/api/work/my', {
+    headers: {
+      "Authorization": "Bearer " + token
+    }
+  });
+
+  const data = await res.json();
+  const works = data.works || [];
 
   const tbody = document.querySelector('#historyTable tbody');
   tbody.innerHTML = '';
 
   let total = 0, paid = 0;
 
-  if(works && works.length){
+  if(works.length){
     works.forEach(w=>{
       total += w.totalAmount || 0;
       paid += w.paymentGiven || 0;
@@ -259,9 +266,7 @@ async function load(){
       tbody.appendChild(tr);
     });
   } else {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td colspan="7" class="empty">No records found</td>`;
-    tbody.appendChild(tr);
+    tbody.innerHTML = `<tr><td colspan="7" class="empty">No records found</td></tr>`;
   }
 
   document.getElementById('totalBox').innerText = '₹' + total.toFixed(2);
