@@ -298,18 +298,19 @@
 
 <script>
 const API = "https://tractor-back-1l40.onrender.com";
-const token = () => localStorage.getItem('adminToken');
+const token = () => localStorage.getItem('token');
 
 let editWorkId = null;
 
-/* ================= LOAD FARMERS AUTOMATICALLY ================= */
 window.onload = loadFarmers;
 
+/* ================= LOAD FARMERS ================= */
 async function loadFarmers(){
-  const res = await fetch(API + '/admin/farmers', {
+  const res = await fetch(API + '/api/admin/farmers', {
     headers:{ Authorization:'Bearer ' + token() }
   });
-  const farmers = await res.json();
+  const data = await res.json();
+  const farmers = data.farmers || [];
 
   const options = farmers.map(f =>
     `<option value="${f._id}">${f.name}</option>`
@@ -323,7 +324,7 @@ async function loadFarmers(){
 }
 
 /* ================= ADD / UPDATE WORK ================= */
-submitBtn.onclick = async ()=>{
+submitBtn.onclick = async ()=> {
   let mins = 0;
   const t = minutes.value.trim();
   if(t.includes('.')){
@@ -341,7 +342,7 @@ submitBtn.onclick = async ()=>{
   };
 
   if(editWorkId){
-    await fetch(API + '/admin/work/' + editWorkId,{
+    await fetch(API + '/api/admin/work/' + editWorkId,{
       method:'PUT',
       headers:{
         'Content-Type':'application/json',
@@ -351,7 +352,7 @@ submitBtn.onclick = async ()=>{
     });
     alert('Work Updated');
   } else {
-    await fetch(API + '/admin/work',{
+    await fetch(API + '/api/admin/work',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
@@ -376,10 +377,11 @@ async function loadHistory(){
   if(!farmerFilter.value) return;
 
   const res = await fetch(
-    API + '/admin/work?farmerId=' + farmerFilter.value,
+    API + '/api/admin/work?farmerId=' + farmerFilter.value,
     { headers:{ Authorization:'Bearer ' + token() } }
   );
-  const works = await res.json();
+  const data = await res.json();
+  const works = data.works || [];
 
   let total = 0, paid = 0;
 
@@ -415,35 +417,12 @@ async function loadHistory(){
   balanceBox.value = total - paid;
 }
 
-/* ================= EDIT INTO FORM ================= */
-function startEdit(id, farmerId, work, mins, rateVal){
-  editWorkId = id;
-  formTitle.innerText = 'Edit Work';
-  submitBtn.innerText = 'Update Work';
-
-  farmerSelect.value = farmerId;
-  workType.value = work;
-  minutes.value = mins;
-  rate.value = rateVal;
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-/* ================= RESET FORM ================= */
-function resetForm(){
-  editWorkId = null;
-  formTitle.innerText = 'Add Work';
-  submitBtn.innerText = 'Add Work';
-  minutes.value = '';
-  rate.value = '';
-}
-
 /* ================= PAYMENT ================= */
 async function pay(id){
   const amt = Number(document.getElementById('pay_'+id).value);
   if(!amt) return alert('Enter amount');
 
-  await fetch(API + '/admin/payment/' + farmerFilter.value,{
+  await fetch(API + '/api/admin/payment/' + farmerFilter.value,{
     method:'POST',
     headers:{
       'Content-Type':'application/json',
@@ -459,20 +438,19 @@ async function pay(id){
 async function deleteWork(id){
   if(!confirm('Delete work?')) return;
 
-  await fetch(API + '/admin/work/' + id,{
+  await fetch(API + '/api/admin/work/' + id,{
     method:'DELETE',
     headers:{ Authorization:'Bearer ' + token() }
   });
 
   loadHistory();
 }
-document.getElementById('logoutBtn').addEventListener('click', () => {
-  if (confirm('Are you sure you want to logout?')) {
-    localStorage.removeItem('adminToken');
-    window.location.href = 'index.html';
-  }
-});
 
+/* ================= LOGOUT ================= */
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  localStorage.clear();
+  location.href = 'index.html';
+});
 </script>
 
 </body>
