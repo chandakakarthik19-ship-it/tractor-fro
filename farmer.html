@@ -45,7 +45,6 @@
       margin-bottom:20px;
     }
 
-    /* INFO HEADER */
     .info{
       display:flex;
       justify-content:space-between;
@@ -77,7 +76,6 @@
       background:var(--danger);
     }
 
-    /* SUMMARY BOXES */
     .summary{
       display:flex;
       gap:20px;
@@ -112,23 +110,20 @@
       margin-bottom:10px;
     }
 
-    /* TABLE */
     table{
       width:100%;
       border-collapse:collapse;
       margin-top:10px;
-      background:rgb(208, 244, 6);
+      background:#fff;
       border-radius:10px;
       overflow:hidden;
     }
 
     th{
-      background:#ef0591;
+      background:#e5e7eb;
       padding:12px;
       font-size:13px;
       font-weight:600;
-      color:#374151;
-      border-bottom:1px solid var(--border);
       text-align:left;
     }
 
@@ -149,13 +144,8 @@
     }
 
     @media(max-width:768px){
-      .summary{
-        flex-direction:column;
-      }
-      .info{
-        flex-direction:column;
-        align-items:flex-start;
-      }
+      .summary{ flex-direction:column; }
+      .info{ flex-direction:column; align-items:flex-start; }
     }
   </style>
 </head>
@@ -167,10 +157,8 @@
 
   <div class="card">
 
-    <!-- INFO -->
     <div class="info" id="info"></div>
 
-    <!-- SUMMARY -->
     <div class="summary">
       <div class="box">
         <label>Total Amount</label>
@@ -186,25 +174,22 @@
       </div>
     </div>
 
-    <!-- HISTORY -->
     <h3>Work History</h3>
 
-    <div id="historyContainer">
-      <table id="historyTable">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Work Type</th>
-            <th>Minutes</th>
-            <th>Rate / 60</th>
-            <th>Total Amount</th>
-            <th>Paid</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Work Type</th>
+          <th>Minutes</th>
+          <th>Rate / 60</th>
+          <th>Total</th>
+          <th>Paid</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
   </div>
 
@@ -214,64 +199,72 @@
 const API = "https://tractor-back-1l40.onrender.com";
 
 async function load(){
-  const token = localStorage.getItem('token');
-  const name = localStorage.getItem('name');
+  const token = localStorage.getItem("token");
+  const name = localStorage.getItem("name");
 
   if(!token){
-    location.href = 'farmer-login.html';
+    location.href = "farmer-login.html";
     return;
   }
 
-  /* FARMER INFO (from localStorage) */
-  document.getElementById('info').innerHTML = `
+  document.getElementById("info").innerHTML = `
     <div>
-      <strong>${name}</strong><br>
+      <strong>${name || "Farmer"}</strong><br>
       <span>Role: Farmer</span>
     </div>
     <div class="actions">
-      <a class="logout" href="index.html" onclick="localStorage.clear()">Logout</a>
+      <a class="logout" href="#" onclick="logout()">Logout</a>
     </div>
   `;
 
-  /* WORK HISTORY (CORRECT API) */
-  const res = await fetch(API + '/api/work/my', {
-    headers: {
-      "Authorization": "Bearer " + token
-    }
+  const res = await fetch(API + "/api/work/my", {
+    headers:{ Authorization:"Bearer " + token }
   });
+
+  /* 🔴 IMPORTANT: handle auth errors */
+  if(res.status === 401 || res.status === 403){
+    alert("Session expired. Please login again.");
+    localStorage.clear();
+    location.href = "farmer-login.html";
+    return;
+  }
 
   const data = await res.json();
   const works = data.works || [];
 
-  const tbody = document.querySelector('#historyTable tbody');
-  tbody.innerHTML = '';
+  const tbody = document.querySelector("#historyTable tbody");
+  tbody.innerHTML = "";
 
   let total = 0, paid = 0;
 
-  if(works.length){
+  if(!works.length){
+    tbody.innerHTML = `<tr><td colspan="7" class="empty">No records found</td></tr>`;
+  } else {
     works.forEach(w=>{
       total += w.totalAmount || 0;
       paid += w.paymentGiven || 0;
 
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${new Date(w.date).toLocaleDateString()}</td>
-        <td>${w.workType || '-'}</td>
-        <td>${w.minutes || 0}</td>
-        <td>₹${w.ratePer60 || 0}</td>
-        <td>₹${(w.totalAmount||0).toFixed(2)}</td>
-        <td>₹${(w.paymentGiven||0).toFixed(2)}</td>
-        <td>${w.notes || '-'}</td>
-      `;
-      tbody.appendChild(tr);
+      tbody.innerHTML += `
+        <tr>
+          <td>${new Date(w.date).toLocaleDateString()}</td>
+          <td>${w.workType || "-"}</td>
+          <td>${w.minutes || 0}</td>
+          <td>₹${w.ratePer60 || 0}</td>
+          <td>₹${(w.totalAmount||0).toFixed(2)}</td>
+          <td>₹${(w.paymentGiven||0).toFixed(2)}</td>
+          <td>${w.notes || "-"}</td>
+        </tr>`;
     });
-  } else {
-    tbody.innerHTML = `<tr><td colspan="7" class="empty">No records found</td></tr>`;
   }
 
-  document.getElementById('totalBox').innerText = '₹' + total.toFixed(2);
-  document.getElementById('paidBox').innerText = '₹' + paid.toFixed(2);
-  document.getElementById('balanceBox').innerText = '₹' + (total - paid).toFixed(2);
+  document.getElementById("totalBox").innerText = "₹" + total.toFixed(2);
+  document.getElementById("paidBox").innerText = "₹" + paid.toFixed(2);
+  document.getElementById("balanceBox").innerText = "₹" + (total - paid).toFixed(2);
+}
+
+function logout(){
+  localStorage.clear();
+  location.href = "farmer-login.html";
 }
 
 load();
