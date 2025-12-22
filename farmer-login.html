@@ -142,7 +142,7 @@
 <script>
 const API = "https://tractor-back-1l40.onrender.com";
 
-document.getElementById('login').addEventListener('click', async ()=>{
+document.getElementById('login').addEventListener('click', async ()=> {
   const phone = document.getElementById('phone').value.trim();
   const password = document.getElementById('password').value;
 
@@ -151,24 +151,25 @@ document.getElementById('login').addEventListener('click', async ()=>{
     return;
   }
 
-  const res = await fetch(API + '/auth/farmer/login', {
-    method:'POST',
-    headers:{ 'Content-Type':'application/json' },
+  const res = await fetch(API + '/api/auth/farmer/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ phone, password })
   });
 
   const data = await res.json();
 
   if(data.token){
-    localStorage.setItem('farmerToken', data.token);
+    localStorage.setItem('token', data.token);
     localStorage.setItem('farmerId', data.farmerId);
-    localStorage.setItem('farmerName', data.name);
+    localStorage.setItem('name', data.name);
     location.href = 'farmer.html';
-  }else{
+  } else {
     alert(data.error || 'Login failed');
   }
 });
 </script>
+
 
 </body>
 </html>
