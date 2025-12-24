@@ -300,18 +300,50 @@ async function loadHistory(){
 
 /* PAYMENT */
 async function makePayment(){
-  if(!paymentFarmer.value||!paymentAmount.value) return alert("Select farmer & enter amount");
+  const farmerId = paymentFarmer.value;
+  const amount = Number(paymentAmount.value);
 
-  await fetch(API+"/api/admin/payment/"+paymentFarmer.value,{
+  if(!farmerId || !amount){
+    return alert("Select farmer & enter amount");
+  }
+
+  const res = await fetch(API+"/api/admin/payment/"+farmerId,{
     method:"POST",
-    headers:{ "Content-Type":"application/json", Authorization:"Bearer "+token() },
-    body:JSON.stringify({amount:Number(paymentAmount.value)})
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:"Bearer "+token()
+    },
+    body:JSON.stringify({ amount })
   });
 
-  alert("Payment successful");
-  paymentAmount.value="";
-  farmerFilter.value=paymentFarmer.value;
-  loadHistory();
+  if(!res.ok){
+    const d = await res.json();
+    return alert(d.error || "Payment failed");
+  }
+
+  // ✅ ADD PAYMENT ROW IMMEDIATELY
+  const today = new Date().toLocaleDateString();
+
+  tbody.innerHTML = `
+    <tr style="background:#ecfdf5">
+      <td>${today}</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td><strong>${amount}</strong></td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+  ` + tbody.innerHTML;
+
+  // ✅ UPDATE SUMMARY
+  paidBox.value = Number(paidBox.value || 0) + amount;
+  balanceBox.value = Number(totalBox.value) - Number(paidBox.value);
+
+  alert("Payment added to history");
+
+  paymentAmount.value = "";
 }
 
 /* SECURE DELETE FARMER */
