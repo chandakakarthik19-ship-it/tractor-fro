@@ -211,6 +211,7 @@ let editWorkId = null;
 window.onload = loadFarmers;
 
 /* LOAD FARMERS (FIXED) */
+<script>
 async function loadFarmers(){
   try{
     const res = await fetch(API + "/api/admin/farmers", {
@@ -244,6 +245,7 @@ async function loadFarmers(){
     alert("Error loading farmers");
   }
 }
+</script>
 
 /* ADD / UPDATE WORK */
 submitBtn.onclick = async () => {
