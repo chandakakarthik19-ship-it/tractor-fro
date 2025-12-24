@@ -213,31 +213,34 @@ window.onload = loadFarmers;
 /* LOAD FARMERS (FIXED) */
 async function loadFarmers(){
   try{
-    const res = await fetch(API + "/api/admin/farmers",{
-      headers:{ Authorization:"Bearer " + token() }
+    const res = await fetch(API + "/api/admin/farmers", {
+      headers: {
+        Authorization: "Bearer " + token()
+      }
     });
 
-    if(!res.ok){
-      alert("Unable to load farmers. Login again.");
-      logout();
+    const data = await res.json();
+    console.log("Farmers API response:", data);
+
+    if (!data.success || !Array.isArray(data.farmers)) {
+      alert("Invalid farmers data");
       return;
     }
 
-    const data = await res.json();
-    const farmers = data.farmers || [];
+    let options = `<option value="">Select Farmer</option>`;
 
-    let opt = '<option value="">Select Farmer</option>';
-    farmers.forEach(f=>{
-      opt += `<option value="${f._id}">${f.name}</option>`;
+    data.farmers.forEach(f => {
+      options += `<option value="${f._id}">${f.name}</option>`;
     });
 
-    document.getElementById("farmerSelect").innerHTML = opt;
-    document.getElementById("paymentFarmer").innerHTML = opt;
-    document.getElementById("farmerFilter").innerHTML = opt;
-    document.getElementById("farmerDeleteSelect").innerHTML = opt;
+    // ✅ IMPORTANT: set ALL dropdowns
+    document.getElementById("farmerSelect").innerHTML = options;
+    document.getElementById("paymentFarmer").innerHTML = options;
+    document.getElementById("farmerFilter").innerHTML = options;
+    document.getElementById("farmerDeleteSelect").innerHTML = options;
 
-  }catch(err){
-    console.error(err);
+  } catch (err) {
+    console.error("Load farmers failed:", err);
     alert("Error loading farmers");
   }
 }
