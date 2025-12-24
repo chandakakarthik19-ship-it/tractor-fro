@@ -210,14 +210,11 @@ if(!token()){
 let editWorkId = null;
 window.onload = loadFarmers;
 
-/* LOAD FARMERS (FIXED) */
-<script>
+/* LOAD FARMERS ✅ FIXED */
 async function loadFarmers(){
   try{
     const res = await fetch(API + "/api/admin/farmers", {
-      headers: {
-        Authorization: "Bearer " + token()
-      }
+      headers: { Authorization: "Bearer " + token() }
     });
 
     const data = await res.json();
@@ -229,28 +226,25 @@ async function loadFarmers(){
     }
 
     let options = `<option value="">Select Farmer</option>`;
-
     data.farmers.forEach(f => {
       options += `<option value="${f._id}">${f.name}</option>`;
     });
 
-    // ✅ IMPORTANT: set ALL dropdowns
-    document.getElementById("farmerSelect").innerHTML = options;
-    document.getElementById("paymentFarmer").innerHTML = options;
-    document.getElementById("farmerFilter").innerHTML = options;
-    document.getElementById("farmerDeleteSelect").innerHTML = options;
+    farmerSelect.innerHTML = options;
+    paymentFarmer.innerHTML = options;
+    farmerFilter.innerHTML = options;
+    farmerDeleteSelect.innerHTML = options;
 
   } catch (err) {
     console.error("Load farmers failed:", err);
     alert("Error loading farmers");
   }
 }
-</script>
 
 /* ADD / UPDATE WORK */
 submitBtn.onclick = async () => {
   const mins = minutes.value.includes(".")
-    ? Number(minutes.value.split(".")[0])*60 + Number(minutes.value.split(".")[1])
+    ? Number(minutes.value.split(".")[0]) * 60 + Number(minutes.value.split(".")[1])
     : Number(minutes.value);
 
   const body = {
@@ -341,9 +335,7 @@ function resetForm(){
   editWorkId = null;
   formTitle.innerText = "Add Work";
   submitBtn.innerText = "Add Work";
-  workType.value = "";
-  minutes.value = "";
-  rate.value = "";
+  workType.value = minutes.value = rate.value = "";
 }
 async function deleteWork(id){
   if(!confirm("Delete work?")) return;
@@ -416,6 +408,6 @@ function logout(){
   location.href = "index.html";
 }
 </script>
-
 </body>
 </html>
+
