@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<body>
+
+<h2>Farmer Load Test</h2>
+<select id="farmerSelect"></select>
+
+<script>
+const API = "https://karthik-back.onrender.com";
+const token = localStorage.getItem("token");
+
+alert("JS RUNNING");
+
+fetch(API + "/api/admin/farmers", {
+  headers:{ Authorization:"Bearer " + token }
+})
+.then(res => res.json())
+.then(data => {
+  alert("API CALLED");
+  let opt = "<option>Select Farmer</option>";
+  data.farmers.forEach(f=>{
+    opt += `<option>${f.name}</option>`;
+  });
+  document.getElementById("farmerSelect").innerHTML = opt;
+})
+.catch(err=>{
+  alert("ERROR");
+  console.error(err);
+});
+</script>
+
+</body>
+</html>
