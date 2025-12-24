@@ -16,30 +16,20 @@
   --card:#ffffff;
   --border:#e5e7eb;
   --text:#111827;
-  --muted:#6b7280;
 }
-
 *{box-sizing:border-box}
-
 body{
   margin:0;
   font-family:"Inter","Segoe UI",Arial,sans-serif;
   background:var(--bg);
   color:var(--text);
 }
-
 .container{
   max-width:900px;
   margin:auto;
   padding:24px;
 }
-
-h2{
-  text-align:center;
-  color:var(--primary-dark);
-  margin-bottom:24px;
-}
-
+h2{text-align:center;color:var(--primary-dark)}
 .card{
   background:var(--card);
   border-radius:14px;
@@ -47,100 +37,62 @@ h2{
   margin-bottom:22px;
   box-shadow:0 8px 22px rgba(0,0,0,0.06);
 }
-
 label{
   display:block;
   margin-top:14px;
   font-weight:600;
-  font-size:14px;
-  color:#374151;
 }
-
 input,select{
   width:100%;
-  padding:10px 12px;
+  padding:10px;
   margin-top:6px;
   border:1px solid var(--border);
   border-radius:8px;
-  font-size:14px;
-  background:#fff;
 }
-
-input:focus,select:focus{
-  outline:none;
-  border-color:var(--primary);
-  box-shadow:0 0 0 2px rgba(37,99,235,0.15);
-}
-
 button{
-  padding:10px 18px;
   margin-top:16px;
-  border-radius:8px;
+  padding:10px 18px;
   border:none;
-  cursor:pointer;
+  border-radius:8px;
   font-weight:600;
+  cursor:pointer;
   background:var(--primary);
-  color:#fff;
+  color:white;
 }
-
-button:hover{background:var(--primary-dark)}
 button.success{background:var(--success)}
-button.danger{background:var(--danger)}
 button.warning{background:var(--warning);color:#111}
-
+button.danger{background:var(--danger)}
 table{
   width:100%;
   border-collapse:collapse;
   margin-top:16px;
   background:#fff;
-  border-radius:10px;
-  overflow:hidden;
 }
-
-th{
-  background:#07d38f;
-  padding:12px;
-  font-size:13px;
-  font-weight:700;
-}
-
-td{
+th,td{
   padding:12px;
   border-bottom:1px solid var(--border);
-  font-size:14px;
   text-align:center;
 }
-
-tr:hover{background#04e0ca}
-
+th{background:#f1f5f9}
 .summary{
   display:flex;
   gap:20px;
   margin-top:20px;
 }
-
 .summary > div{
   flex:1;
-  background:#fff700;
-  border:1px solid var(--border);
-  border-radius:8px;
+  background:#f8fafc;
   padding:16px;
+  border-radius:10px;
 }
-
 .summary input{
   border:none;
   background:none;
-  font-size:26px;
+  font-size:22px;
   font-weight:700;
 }
-
 .center{text-align:center}
-
-@media(max-width:768px){
-  .summary{flex-direction:column}
-}
 </style>
-
 </head>
 
 <body>
@@ -152,10 +104,10 @@ tr:hover{background#04e0ca}
 <div class="card">
   <h3 id="formTitle">Add Work</h3>
 
-  <label>Farmer</label>
+  <label for="farmerSelect">Farmer</label>
   <select id="farmerSelect"></select>
 
-  <label>Work Type</label>
+  <label for="workType">Work Type</label>
   <select id="workType">
     <option value="">-- Select --</option>
     <option>దుక్కు</option>
@@ -166,18 +118,31 @@ tr:hover{background#04e0ca}
     <option>గత్తం</option>
   </select>
 
-  <label>Minutes</label>
+  <label for="minutes">Minutes</label>
   <input id="minutes" placeholder="1.20 = 1h 20m">
 
-  <label>Rate per Hour</label>
+  <label for="rate">Rate per Hour</label>
   <input id="rate" type="number">
 
   <button id="submitBtn">Add Work</button>
 </div>
 
+<!-- PAYMENT -->
+<div class="card">
+  <h3>Farmer Payment</h3>
+
+  <label for="paymentFarmer">Select Farmer</label>
+  <select id="paymentFarmer"></select>
+
+  <label for="paymentAmount">Payment Amount</label>
+  <input id="paymentAmount" type="number" placeholder="Enter amount">
+
+  <button class="success" onclick="makePayment()">Pay Amount</button>
+</div>
+
 <!-- HISTORY -->
 <div class="card">
-  <label>Farmer History</label>
+  <label for="farmerFilter">Farmer History</label>
   <select id="farmerFilter"></select>
 
   <table>
@@ -190,7 +155,6 @@ tr:hover{background#04e0ca}
         <th>Total</th>
         <th>Paid</th>
         <th>Balance</th>
-        <th>Payment</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -204,41 +168,36 @@ tr:hover{background#04e0ca}
   </div>
 </div>
 
-<!-- CHANGE PASSWORD BUTTON -->
+<!-- CHANGE PASSWORD -->
 <div class="card center">
-  <button class="warning" onclick="togglePasswordBox()">
-    Change Admin Password
-  </button>
+  <button class="warning" onclick="togglePasswordBox()">Change Admin Password</button>
 </div>
 
-<!-- CHANGE PASSWORD FORM -->
 <div class="card" id="passwordBox" style="display:none">
-  <h3>Change Admin Password</h3>
-
-  <label>Old Password</label>
+  <label for="oldPass">Old Password</label>
   <input id="oldPass" type="password">
 
-  <label>New Password</label>
+  <label for="newPass">New Password</label>
   <input id="newPass" type="password">
 
   <button onclick="changePassword()">Update Password</button>
 </div>
 
-<!-- MANAGE FARMERS BUTTON -->
+<!-- MANAGE FARMERS (SECURE DELETE) -->
 <div class="card center">
-  <button class="warning" onclick="toggleFarmers()">
-    Manage Farmers
-  </button>
+  <button class="warning" onclick="toggleFarmers()">Manage Farmers</button>
 </div>
 
-<!-- MANAGE FARMERS -->
 <div class="card" id="farmersBox" style="display:none">
-  <h3>Registered Farmers</h3>
+  <label for="farmerDeleteSelect">Select Farmer</label>
   <select id="farmerDeleteSelect"></select>
-  <button class="danger" onclick="deleteFarmer()">Delete Farmer</button>
+
+  <label for="adminDeletePass">Admin Password</label>
+  <input id="adminDeletePass" type="password" placeholder="Enter admin password">
+
+  <button class="danger" onclick="deleteFarmerSecure()">Delete Farmer</button>
 </div>
 
-<!-- LOGOUT -->
 <div class="center">
   <button class="danger" onclick="logout()">Logout</button>
 </div>
@@ -246,115 +205,142 @@ tr:hover{background#04e0ca}
 </div>
 
 <script>
-const API = "https://tractor-back-1l40.onrender.com";
-const token = () => localStorage.getItem("token");
-
-let editWorkId = null;
-window.onload = loadFarmers;
+const API="https://tractor-back-1l40.onrender.com";
+const token=()=>localStorage.getItem("token");
+let editWorkId=null;
+window.onload=loadFarmers;
 
 /* LOAD FARMERS */
 async function loadFarmers(){
-  const res = await fetch(API+"/api/admin/farmers",{
-    headers:{Authorization:"Bearer "+token()}
-  });
-  const data = await res.json();
-  const farmers = data.farmers || [];
+  const res=await fetch(API+"/api/admin/farmers",{headers:{Authorization:"Bearer "+token()}});
+  const data=await res.json();
+  const farmers=data.farmers||[];
 
-  let opt = '<option value="">-- Select --</option>';
-  farmers.forEach(f=>{
-    opt += `<option value="${f._id}">${f.name}</option>`;
-  });
+  let opt='<option value="">-- Select --</option>';
+  farmers.forEach(f=>opt+=`<option value="${f._id}">${f.name}</option>`);
 
-  farmerSelect.innerHTML = opt;
-  farmerFilter.innerHTML = opt;
-  farmerDeleteSelect.innerHTML = opt;
+  farmerSelect.innerHTML=opt;
+  farmerFilter.innerHTML=opt;
+  farmerDeleteSelect.innerHTML=opt;
+  paymentFarmer.innerHTML=opt;
 }
 
 /* ADD / UPDATE WORK */
-submitBtn.onclick = async ()=>{
-  let mins = minutes.value.includes(".")
-    ? minutes.value.split(".")[0]*60 + Number(minutes.value.split(".")[1])
+submitBtn.onclick=async()=>{
+  let mins=minutes.value.includes(".")
+    ? minutes.value.split(".")[0]*60+Number(minutes.value.split(".")[1])
     : Number(minutes.value);
 
-  const body = {
-    farmerId: farmerSelect.value,
-    workType: workType.value,
-    minutes: mins,
-    ratePer60: Number(rate.value)
-  };
+  const body={farmerId:farmerSelect.value,workType:workType.value,minutes:mins,ratePer60:Number(rate.value)};
 
-  if(editWorkId){
-    await fetch(API+"/api/admin/work/"+editWorkId,{
-      method:"PUT",
-      headers:{ "Content-Type":"application/json", Authorization:"Bearer "+token() },
-      body:JSON.stringify(body)
-    });
-    alert("Work Updated");
-  } else {
-    await fetch(API+"/api/admin/work",{
-      method:"POST",
-      headers:{ "Content-Type":"application/json", Authorization:"Bearer "+token() },
-      body:JSON.stringify(body)
-    });
-    alert("Work Added");
-  }
+  const url=editWorkId?API+"/api/admin/work/"+editWorkId:API+"/api/admin/work";
+  const method=editWorkId?"PUT":"POST";
 
-  const f = farmerSelect.value;
+  await fetch(url,{
+    method,
+    headers:{ "Content-Type":"application/json", Authorization:"Bearer "+token() },
+    body:JSON.stringify(body)
+  });
+
+  alert(editWorkId?"Work Updated":"Work Added");
   resetForm();
-  farmerFilter.value = f;
+  farmerFilter.value=body.farmerId;
   loadHistory();
 };
 
 /* LOAD HISTORY */
-farmerFilter.onchange = loadHistory;
-
+farmerFilter.onchange=loadHistory;
 async function loadHistory(){
   tbody.innerHTML="";
   if(!farmerFilter.value) return;
 
-  const res = await fetch(API+"/api/admin/work?farmerId="+farmerFilter.value,{
+  const res=await fetch(API+"/api/admin/work?farmerId="+farmerFilter.value,{
     headers:{Authorization:"Bearer "+token()}
   });
-  const data = await res.json();
-  const works = data.works || [];
+  const data=await res.json();
+  const works=data.works||[];
 
   let total=0, paid=0;
 
   works.forEach(w=>{
-    const p = w.paymentGiven || 0;
-    const b = w.totalAmount - p;
-    total += w.totalAmount;
-    paid += p;
+    total+=w.totalAmount;
+    paid+=w.paymentGiven||0;
 
-    tbody.innerHTML += `
-    <tr>
-      <td>${new Date(w.date).toLocaleDateString()}</td>
-      <td>${w.workType}</td>
-      <td>${w.minutes}</td>
-      <td>${w.ratePer60}</td>
-      <td>${w.totalAmount}</td>
-      <td>${p}</td>
-      <td>${b}</td>
-      <td>
-        <input id="pay_${w._id}" type="number">
-        <button class="success" onclick="pay('${w._id}')">Pay</button>
-      </td>
-      <td>
-        <button class="warning"
-          onclick="startEdit('${w._id}','${w.farmer._id}','${w.workType}',${w.minutes},${w.ratePer60})">Edit</button>
-        <button class="danger" onclick="deleteWork('${w._id}')">Delete</button>
-      </td>
-    </tr>`;
+    if(w.paymentGiven>0){
+      tbody.innerHTML+=`
+      <tr>
+        <td>${new Date().toLocaleDateString()}</td>
+        <td>-</td><td>-</td><td>-</td><td>-</td>
+        <td>${w.paymentGiven}</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>`;
+    }else{
+      tbody.innerHTML+=`
+      <tr>
+        <td>${new Date(w.date).toLocaleDateString()}</td>
+        <td>${w.workType}</td>
+        <td>${w.minutes}</td>
+        <td>${w.ratePer60}</td>
+        <td>${w.totalAmount}</td>
+        <td>-</td>
+        <td>-</td>
+        <td>
+          <button class="warning" onclick="startEdit('${w._id}','${w.farmer._id}','${w.workType}',${w.minutes},${w.ratePer60})">Edit</button>
+          <button class="danger" onclick="deleteWork('${w._id}')">Delete</button>
+        </td>
+      </tr>`;
+    }
   });
 
-  totalBox.value = total;
-  paidBox.value = paid;
-  balanceBox.value = total - paid;
+  totalBox.value=total;
+  paidBox.value=paid;
+  balanceBox.value=total-paid;
 }
 
-/* EDIT */
-function startEdit(id, farmerId, work, mins, rate){
-  editWorkId = id;
+/* PAYMENT */
+async function makePayment(){
+  if(!paymentFarmer.value||!paymentAmount.value) return alert("Select farmer & enter amount");
+
+  await fetch(API+"/api/admin/payment/"+paymentFarmer.value,{
+    method:"POST",
+    headers:{ "Content-Type":"application/json", Authorization:"Bearer "+token() },
+    body:JSON.stringify({amount:Number(paymentAmount.value)})
+  });
+
+  alert("Payment successful");
+  paymentAmount.value="";
+  farmerFilter.value=paymentFarmer.value;
+  loadHistory();
+}
+
+/* SECURE DELETE FARMER */
+async function deleteFarmerSecure(){
+  if(!farmerDeleteSelect.value||!adminDeletePass.value)
+    return alert("Select farmer & enter admin password");
+
+  if(!confirm("Delete farmer and all works?")) return;
+
+  const res=await fetch(API+"/api/admin/farmer/"+farmerDeleteSelect.value,{
+    method:"DELETE",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:"Bearer "+token()
+    },
+    body:JSON.stringify({adminPassword:adminDeletePass.value})
+  });
+
+  const data=await res.json();
+  if(!res.ok) return alert(data.error);
+
+  alert("Farmer deleted");
+  adminDeletePass.value="";
+  loadFarmers();
+}
+
+/* HELPERS */
+function startEdit(id,farmerId,work,mins,rate){
+  editWorkId=id;
   formTitle.innerText="Edit Work";
   submitBtn.innerText="Update Work";
   farmerSelect.value=farmerId;
@@ -363,7 +349,6 @@ function startEdit(id, farmerId, work, mins, rate){
   rate.value=rate;
   window.scrollTo({top:0,behavior:"smooth"});
 }
-
 function resetForm(){
   editWorkId=null;
   formTitle.innerText="Add Work";
@@ -373,75 +358,24 @@ function resetForm(){
   minutes.value="";
   rate.value="";
 }
-
-/* PAYMENT */
-async function pay(id){
-  const amt = Number(document.getElementById("pay_"+id).value);
-  if(!amt) return alert("Enter amount");
-
-  await fetch(API+"/api/admin/payment/"+farmerFilter.value,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json", Authorization:"Bearer "+token() },
-    body:JSON.stringify({workId:id,amount:amt})
-  });
-  loadHistory();
-}
-
-/* DELETE WORK */
 async function deleteWork(id){
   if(!confirm("Delete work?")) return;
-  await fetch(API+"/api/admin/work/"+id,{
-    method:"DELETE",
-    headers:{Authorization:"Bearer "+token()}
-  });
+  await fetch(API+"/api/admin/work/"+id,{method:"DELETE",headers:{Authorization:"Bearer "+token()}});
   loadHistory();
 }
-
-/* CHANGE PASSWORD */
+function togglePasswordBox(){passwordBox.style.display=passwordBox.style.display==="none"?"block":"none";}
+function toggleFarmers(){farmersBox.style.display=farmersBox.style.display==="none"?"block":"none";}
 async function changePassword(){
-  const oldPassword = oldPass.value;
-  const newPassword = newPass.value;
-  if(!oldPassword || !newPassword) return alert("Enter both passwords");
-
-  const res = await fetch(API+"/api/admin/change-password",{
+  if(!oldPass.value||!newPass.value) return alert("Enter passwords");
+  const res=await fetch(API+"/api/admin/change-password",{
     method:"POST",
     headers:{ "Content-Type":"application/json", Authorization:"Bearer "+token() },
-    body:JSON.stringify({ oldPassword, newPassword })
+    body:JSON.stringify({oldPassword:oldPass.value,newPassword:newPass.value})
   });
-
-  const data = await res.json();
-  if(!res.ok) alert(data.error);
-  else alert("Password updated");
-  oldPass.value=""; newPass.value="";
+  const d=await res.json();
+  alert(res.ok?"Password updated":d.error);
+  oldPass.value=newPass.value="";
 }
-
-/* TOGGLES */
-function togglePasswordBox(){
-  passwordBox.style.display =
-    passwordBox.style.display==="none" ? "block" : "none";
-}
-
-function toggleFarmers(){
-  farmersBox.style.display =
-    farmersBox.style.display==="none" ? "block" : "none";
-}
-
-/* DELETE FARMER */
-async function deleteFarmer(){
-  const id = farmerDeleteSelect.value;
-  if(!id) return alert("Select farmer");
-  if(!confirm("Delete farmer and all works?")) return;
-
-  await fetch(API+"/api/admin/farmer/"+id,{
-    method:"DELETE",
-    headers:{Authorization:"Bearer "+token()}
-  });
-
-  alert("Farmer deleted");
-  loadFarmers();
-}
-
-/* LOGOUT */
 function logout(){
   localStorage.clear();
   location.href="index.html";
